@@ -13,6 +13,10 @@ from utils.persistence import save as _save
 def init_session_state():
     """Set default values for every key used across the app."""
     defaults = {
+        # Auth
+        "logged_in": False,
+        "auth_username": "",
+
         # Onboarding
         "onboarded": False,
         "user_name": "",

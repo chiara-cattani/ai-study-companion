@@ -20,7 +20,6 @@ def load_css():
 load_css()
 
 # Inject JS to colour radio buttons green when selected.
-# CSS alone cannot reach BaseWeb's dynamically-rendered circle.
 import streamlit.components.v1 as components
 components.html("""
 <script>
@@ -30,7 +29,6 @@ components.html("""
         doc.querySelectorAll('.stRadio label').forEach(function(label) {
             var input = label.querySelector('input[type="radio"]');
             if (!input) return;
-            // Find the visual circle — first <div> or <span> inside the label
             var circle = label.querySelector('div > div, span > span, div');
             if (!circle) return;
             if (input.checked) {
@@ -44,7 +42,6 @@ components.html("""
             }
         });
     }
-    // Run once on load, then watch for any DOM/attribute changes
     applyRadioStyles();
     var observer = new MutationObserver(applyRadioStyles);
     observer.observe(window.parent.document.body, {
@@ -57,12 +54,20 @@ components.html("""
 from utils.persistence import load as _load_data, delete as _delete_data  # noqa: E402
 from utils.state_manager import init_session_state  # noqa: E402
 
-# Restore persisted data once per session (before init fills in defaults)
+init_session_state()
+
+# ── Auth gate ───────────────────────────────────────────────────────────────
+if not st.session_state.get("logged_in"):
+    from components.login import render_login
+    render_login()
+    st.stop()
+
+# ── Load persisted data once per session (after auth so we know the username)
 if not st.session_state.get("_data_loaded"):
     _load_data(st.session_state)
     st.session_state["_data_loaded"] = True
-
-init_session_state()
+    # Re-init so any loaded values fill in defaults correctly
+    init_session_state()
 
 # Restore page from URL on refresh, then keep URL in sync
 _qp = st.query_params.get("p", "")
@@ -114,13 +119,22 @@ with st.sidebar:
         st.markdown(f"**Goal:** {st.session_state.study_goal}")
         if st.session_state.get("baseline_symptoms"):
             st.markdown(f"**Baseline:** {', '.join(st.session_state.baseline_symptoms)}")
-
         st.markdown("---")
 
+    # Log out (keeps data intact)
+    if st.button("Log out", use_container_width=True):
+        for k in list(st.session_state.keys()):
+            del st.session_state[k]
+        st.query_params.clear()
+        st.rerun()
+
+    # Reset wipes all data for this user
+    if st.session_state.get("onboarded"):
         if st.button("Reset / New Session", use_container_width=True):
-            _delete_data()
+            _delete_data(st.session_state)
             for k in list(st.session_state.keys()):
                 del st.session_state[k]
+            st.query_params.clear()
             st.rerun()
 
     st.markdown("---")
