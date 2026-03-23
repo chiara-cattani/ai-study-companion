@@ -189,6 +189,9 @@ def render_progress():
     labels = [d["date"] for d in data]
     scores = [d["digestion_score"] for d in data]
 
+    _TICK  = dict(color="#374151", size=11)
+    _LABEL = dict(color="#374151", size=12)
+
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=labels,
@@ -203,14 +206,27 @@ def render_progress():
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(showgrid=False, tickfont=dict(size=11)),
-        yaxis=dict(range=[0, 5.5], showgrid=True, gridcolor="#F0F4F8", tickfont=dict(size=11)),
+        font=dict(color="#374151", family="Inter, sans-serif"),
+        xaxis=dict(
+            showgrid=False,
+            tickfont=_TICK,
+            linecolor="#E2E8F0",
+            tickcolor="#E2E8F0",
+        ),
+        yaxis=dict(
+            range=[0, 5.5],
+            showgrid=True,
+            gridcolor="#E2E8F0",
+            tickfont=_TICK,
+            linecolor="#E2E8F0",
+            tickcolor="#E2E8F0",
+        ),
         margin=dict(l=0, r=0, t=10, b=0),
         height=280,
     )
     st.plotly_chart(fig, use_container_width=True)
 
-    # Mood distribution (demo)
+    # Task completion
     st.markdown("---")
     st.markdown("### Task Completion Rate")
     completion_data = {
@@ -225,12 +241,19 @@ def render_progress():
         marker_color=["#B2DFDB", "#80CBC4", "#4DB6AC", "#4CAF82"],
         text=[f"{v}%" for v in completion_data.values()],
         textposition="outside",
+        textfont=dict(color="#374151", size=13, family="Inter, sans-serif"),
     ))
     fig2.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(showgrid=False),
-        yaxis=dict(range=[0, 110], showgrid=False, visible=False),
+        font=dict(color="#374151", family="Inter, sans-serif"),
+        xaxis=dict(
+            showgrid=False,
+            tickfont=_LABEL,
+            linecolor="#E2E8F0",
+            tickcolor="#E2E8F0",
+        ),
+        yaxis=dict(range=[0, 115], showgrid=False, visible=False),
         margin=dict(l=0, r=0, t=20, b=0),
         height=220,
     )

@@ -103,30 +103,34 @@ def render_chatbot():
 
 
 def _render_messages():
-    """Render the conversation bubble by bubble."""
-    for msg in st.session_state.chat_messages:
-        ts = msg.get("timestamp", "")
-        content = _md(msg["content"])
+    """Render all messages inside a fixed-height scrollable container.
 
+    Uses flex-direction:column-reverse so newest messages are always visible
+    at the bottom with zero JavaScript — no iframe, no layout shift.
+    """
+    # Reverse order: column-reverse CSS will flip them back visually,
+    # newest message ends up at the bottom and scroll starts there.
+    bubbles = ""
+    for msg in reversed(st.session_state.chat_messages):
+        ts      = msg.get("timestamp", "")
+        content = _md(msg["content"])
         if msg["role"] == "user":
-            st.markdown(f"""
+            bubbles += f"""
             <div class="msg-row msg-user">
                 <div class="bubble bubble-user">
-                    {content}
-                    <span class="msg-ts">{ts}</span>
+                    {content}<span class="msg-ts">{ts}</span>
                 </div>
-            </div>
-            """, unsafe_allow_html=True)
+            </div>"""
         else:
-            st.markdown(f"""
+            bubbles += f"""
             <div class="msg-row msg-ai">
                 <div class="bubble-avatar">🌿</div>
                 <div class="bubble bubble-ai">
-                    {content}
-                    <span class="msg-ts">{ts}</span>
+                    {content}<span class="msg-ts">{ts}</span>
                 </div>
-            </div>
-            """, unsafe_allow_html=True)
+            </div>"""
+
+    st.markdown(f'<div class="chat-scroll">{bubbles}</div>', unsafe_allow_html=True)
 
 
 def _send(text: str):
@@ -141,8 +145,7 @@ def _send(text: str):
     }
     provider = st.session_state.get("llm_provider", "demo")
 
-    with st.spinner(""):
-        response = generate_response(text, context, provider)
+    response = generate_response(text, context, provider)
 
     add_chat_message("assistant", response)
     st.rerun()

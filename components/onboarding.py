@@ -5,6 +5,7 @@ Onboarding flow: 3 steps — name, study goal, baseline symptoms.
 import streamlit as st
 from datetime import date
 from utils.state_manager import add_chat_message
+from utils.persistence import save as _save
 
 STUDY_GOALS = [
     "Improve digestion",
@@ -142,4 +143,5 @@ def _step_symptoms():
                 f"I'm here to support your goal to **{goal.lower()}**. "
                 "Let's make this study a success together! What would you like to do today?",
             )
+            _save(st.session_state)
             st.rerun()

@@ -5,6 +5,7 @@ All study data lives in st.session_state for this prototype.
 
 import streamlit as st
 from datetime import date, datetime, timedelta
+from utils.persistence import save as _save
 
 
 # ── Initialisation ─────────────────────────────────────────────────────────
@@ -35,12 +36,8 @@ def init_session_state():
         "meal_feedback": "",
         "meal_logged": False,
 
-        # Today's task checklist
-        "tasks_today": {
-            "diary": False,
-            "meals": False,
-            "check_in": False,
-        },
+        # tasks_today derived from real data below — not set here
+
 
         # Settings
         "demo_mode": True,
@@ -54,6 +51,15 @@ def init_session_state():
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
+
+    # Derive today's task completion from real data so it survives refresh
+    if "tasks_today" not in st.session_state:
+        today = date.today().isoformat()
+        st.session_state.tasks_today = {
+            "diary":    today in st.session_state.diary_entries,
+            "meals":    bool(st.session_state.meal_logs.get(today)),
+            "check_in": False,
+        }
 
     # Generate demo historical data once
     if "demo_diary_data" not in st.session_state:
@@ -101,6 +107,11 @@ def get_streak() -> int:
 def get_days_in_study() -> int:
     start = st.session_state.get("study_start_date")
     if start:
+        if isinstance(start, str):
+            try:
+                start = date.fromisoformat(start)
+            except ValueError:
+                return 1
         return (date.today() - start).days + 1
     return 1
 
@@ -117,6 +128,7 @@ def save_diary_entry(entry: dict):
     for d in st.session_state.demo_diary_data:
         if d["date"] == today_str:
             d["digestion_score"] = entry["digestion_score"]
+            _save(st.session_state)
             return
     st.session_state.demo_diary_data.append({
         "date": today_str,
@@ -124,6 +136,7 @@ def save_diary_entry(entry: dict):
         "digestion_score": entry["digestion_score"],
         "completed": True,
     })
+    _save(st.session_state)
 
 
 def save_meal_log(meal: dict):
@@ -132,6 +145,7 @@ def save_meal_log(meal: dict):
         st.session_state.meal_logs[today] = []
     st.session_state.meal_logs[today].append(meal)
     st.session_state.tasks_today["meals"] = True
+    _save(st.session_state)
 
 
 def add_chat_message(role: str, content: str):

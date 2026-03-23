@@ -54,9 +54,25 @@ components.html("""
 </script>
 """, height=0)
 
+from utils.persistence import load as _load_data, delete as _delete_data  # noqa: E402
 from utils.state_manager import init_session_state  # noqa: E402
 
+# Restore persisted data once per session (before init fills in defaults)
+if not st.session_state.get("_data_loaded"):
+    _load_data(st.session_state)
+    st.session_state["_data_loaded"] = True
+
 init_session_state()
+
+# Restore page from URL on refresh, then keep URL in sync
+_qp = st.query_params.get("p", "")
+if _qp and not st.session_state.get("_page_synced"):
+    if st.session_state.get("onboarded"):
+        st.session_state.current_page = _qp
+    st.session_state["_page_synced"] = True
+
+if st.session_state.get("onboarded"):
+    st.query_params["p"] = st.session_state.get("current_page", "dashboard")
 
 # ── Sidebar ────────────────────────────────────────────────────────────────
 with st.sidebar:
@@ -102,6 +118,7 @@ with st.sidebar:
         st.markdown("---")
 
         if st.button("Reset / New Session", use_container_width=True):
+            _delete_data()
             for k in list(st.session_state.keys()):
                 del st.session_state[k]
             st.rerun()
