@@ -1,0 +1,774 @@
+/* ═══════════════════════════════════════════════
+   Study Companion AI — Mobile-First Stylesheet
+   Health app aesthetic: soft greens, clean whites
+   ═══════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── Tokens ─────────────────────────────────── */
+:root {
+    --green:       #4CAF82;
+    --green-light: #E8F5EE;
+    --green-dark:  #2E7D5E;
+    --blue:        #5B9BD5;
+    --blue-light:  #EAF2FB;
+    --amber:       #F5A623;
+    --amber-light: #FFF8E6;
+    --red:         #E74C3C;
+    --bg:          #F5F7FA;
+    --surface:     #FFFFFF;
+    --border:      #E2E8F0;
+    --text-h:      #1A2740;
+    --text-body:   #374151;
+    --text-muted:  #8896A7;
+    --radius:      14px;
+    --radius-sm:   8px;
+    --shadow:      0 2px 12px rgba(0,0,0,0.07);
+    --shadow-md:   0 4px 24px rgba(0,0,0,0.10);
+}
+
+/* ── Base reset + force light theme ─────────── */
+html, body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: #F5F7FA !important;
+    color: #1A2740 !important;
+}
+
+/* Force light background on every Streamlit container */
+[data-testid="stAppViewContainer"],
+[data-testid="stMainBlockContainer"],
+[data-testid="stVerticalBlock"],
+[data-testid="stHorizontalBlock"],
+.main, .block-container,
+[class*="css"] {
+    background-color: #F5F7FA !important;
+}
+
+/* Force ALL text dark — beats Streamlit dark theme */
+*, *::before, *::after {
+    color: #1A2740 !important;
+}
+
+/* Captions — visible dark grey */
+.stCaption, .stCaption *,
+[data-testid="stCaptionContainer"],
+[data-testid="stCaptionContainer"] * {
+    color: #4B5563 !important;
+    font-size: 0.88rem !important;
+}
+
+/* Widget labels */
+label,
+[data-testid="stWidgetLabel"],
+[data-testid="stWidgetLabel"] * {
+    color: #1A2740 !important;
+}
+
+/* Radio / checkbox option text */
+.stRadio [data-testid="stMarkdownContainer"] p,
+.stCheckbox [data-testid="stMarkdownContainer"] p {
+    color: #1A2740 !important;
+}
+
+/* Constrain width on desktop — feels like a phone */
+.main .block-container {
+    max-width: 480px !important;
+    padding: 1rem 1.25rem 4rem !important;
+    margin: 0 auto !important;
+}
+
+/* Hide Streamlit default branding and helper hints */
+#MainMenu, footer, header { visibility: hidden; }
+/* Hide "Press Enter to apply" tooltip on text inputs */
+[data-testid="InputInstructions"],
+small[data-testid="InputInstructions"] { display: none !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ── Typography ─────────────────────────────── */
+h1, h2, h3, h4 {
+    color: var(--text-h);
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+p { line-height: 1.6; }
+
+/* ── Buttons ─────────────────────────────────── */
+.stButton > button {
+    border-radius: var(--radius-sm) !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    padding: 0.55rem 1rem !important;
+    border: 1.5px solid var(--border) !important;
+    background: var(--surface) !important;
+    color: var(--text-body) !important;
+    transition: all 0.18s ease !important;
+    box-shadow: none !important;
+}
+.stButton > button:hover {
+    border-color: var(--green) !important;
+    color: var(--green) !important;
+    background: var(--green-light) !important;
+}
+
+/* Primary buttons */
+.stButton > button[kind="primary"],
+.stButton > button[data-testid*="primary"] {
+    background: var(--green) !important;
+    color: #fff !important;
+    border-color: var(--green) !important;
+}
+.stButton > button[kind="primary"]:hover {
+    background: var(--green-dark) !important;
+    border-color: var(--green-dark) !important;
+    color: #fff !important;
+}
+
+/* ══════════════════════════════════════════════
+   INPUTS — white background in ALL states
+   ══════════════════════════════════════════════ */
+
+/* Text input wrappers */
+.stTextInput,
+.stTextInput > div,
+.stTextInput > div > div {
+    background: #ffffff !important;
+}
+
+/* The actual <input> — every state */
+.stTextInput input,
+.stTextInput input:focus,
+.stTextInput input:hover,
+.stTextInput input:active,
+.stTextInput input:not([type]),
+.stTextArea textarea,
+.stTextArea textarea:focus,
+.stTextArea textarea:hover,
+.stTextArea textarea:active,
+.stNumberInput input,
+.stNumberInput input:focus {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #1A2740 !important;
+    caret-color: #1A2740 !important;
+    border-color: #D1D5DB !important;
+    border-radius: var(--radius-sm) !important;
+    font-size: 0.95rem !important;
+    -webkit-text-fill-color: #1A2740 !important;
+}
+
+/* Focus ring */
+.stTextInput input:focus,
+.stTextArea textarea:focus {
+    border-color: #4CAF82 !important;
+    box-shadow: 0 0 0 3px rgba(76,175,130,0.15) !important;
+    outline: none !important;
+}
+
+/* Placeholder */
+.stTextInput input::placeholder,
+.stTextArea textarea::placeholder {
+    color: #9CA3AF !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #9CA3AF !important;
+}
+
+/* Autocomplete fill (Chrome) */
+.stTextInput input:-webkit-autofill,
+.stTextInput input:-webkit-autofill:hover,
+.stTextInput input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+    -webkit-text-fill-color: #1A2740 !important;
+    caret-color: #1A2740 !important;
+}
+
+/* ── Selectbox ─────────────────────────────── */
+.stSelectbox,
+.stSelectbox > div,
+.stSelectbox > div > div,
+.stSelectbox [data-baseweb="select"],
+.stSelectbox [data-baseweb="select"] > div,
+.stSelectbox [data-baseweb="select"] > div > div {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    border-color: #D1D5DB !important;
+    border-radius: var(--radius-sm) !important;
+    cursor: pointer !important;
+    caret-color: transparent !important;
+}
+.stSelectbox [data-baseweb="select"] span,
+.stSelectbox [data-baseweb="select"] div {
+    color: #1A2740 !important;
+    background: #ffffff !important;
+}
+/* Arrow icon */
+.stSelectbox svg { fill: #374151 !important; color: #374151 !important; }
+
+/* Dropdown popup — portal-rendered outside main DOM */
+[data-baseweb="popover"],
+[data-baseweb="popover"] *,
+[data-baseweb="menu"],
+[data-baseweb="menu"] *,
+[data-baseweb="list"],
+[data-baseweb="list"] * {
+    background-color: #ffffff !important;
+    color: #1A2740 !important;
+}
+[data-baseweb="popover"] {
+    border: 1px solid #D1D5DB !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10) !important;
+    overflow: hidden !important;
+}
+[data-baseweb="option"] {
+    background-color: #ffffff !important;
+    color: #1A2740 !important;
+    padding: 0.55rem 0.9rem !important;
+}
+[data-baseweb="option"]:hover,
+[data-baseweb="option"][aria-selected="true"] {
+    background-color: #E8F5EE !important;
+    color: #2E7D5E !important;
+}
+
+/* ── Checkboxes ────────────────────────────── */
+.stCheckbox input[type="checkbox"] {
+    accent-color: #4CAF82 !important;
+}
+/* Visual box — white background, grey border */
+.stCheckbox [data-baseweb="checkbox"] > span:first-child {
+    background-color: #ffffff !important;
+    border: 2px solid #9CA3AF !important;
+    border-radius: 4px !important;
+}
+/* Tick/checkmark — use filter to override Streamlit's dynamic emotion CSS.
+   brightness(0) renders it black first, then hue-shift to green. */
+.stCheckbox svg {
+    filter: brightness(0) saturate(100%) invert(40%) sepia(80%) saturate(500%) hue-rotate(115deg) brightness(95%) !important;
+}
+/* Radio & checkbox labels */
+.stRadio label,
+.stCheckbox label {
+    color: #1A2740 !important;
+}
+/* General widget labels */
+.stTextInput label,
+.stTextArea label,
+.stSelectbox label,
+.stRadio > label,
+.stCheckbox > label,
+.stSlider label,
+[data-testid="stWidgetLabel"] {
+    color: #374151 !important;
+}
+/* Slider value text */
+.stSlider [data-testid="stTickBarMin"],
+.stSlider [data-testid="stTickBarMax"],
+.stSlider > div > div > div > div {
+    color: #374151 !important;
+}
+/* Caption / help text */
+.stCaption, small, .stMarkdown p small {
+    color: #6B7A8D !important;
+}
+/* General paragraph and markdown text */
+.stMarkdown p,
+.stMarkdown li,
+.stMarkdown span {
+    color: #374151 !important;
+}
+
+/* Progress bar */
+.stProgress > div > div > div > div {
+    background: linear-gradient(90deg, var(--green), #80CBC4) !important;
+    border-radius: 99px !important;
+}
+.stProgress > div > div > div {
+    background: var(--border) !important;
+    border-radius: 99px !important;
+    height: 10px !important;
+}
+
+/* Metrics */
+[data-testid="metric-container"] {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+[data-testid="metric-container"] label {
+    font-size: 0.75rem !important;
+    color: var(--text-muted) !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+[data-testid="metric-container"] [data-testid="metric-value"] {
+    font-size: 1.6rem !important;
+    font-weight: 700 !important;
+    color: var(--green) !important;
+}
+
+/* ── Onboarding ─────────────────────────────── */
+.hero {
+    text-align: center;
+    padding: 2rem 0 1.5rem;
+    background: transparent;
+}
+.hero-logo {
+    font-size: 3.5rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+.hero-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1A2740 !important;
+    margin: 0;
+}
+.hero-sub {
+    color: #4B5563 !important;
+    font-size: 0.95rem;
+    margin-top: 0.3rem;
+}
+
+/* Step indicator */
+.step-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin: 1.25rem auto;
+    max-width: 200px;
+}
+.step-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #D1D5DB;
+    color: #374151 !important;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.25s;
+}
+.step-dot.active {
+    background: var(--green);
+    color: #ffffff !important;
+    box-shadow: 0 0 0 4px rgba(76,175,130,0.2);
+}
+.step-line {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    transition: background 0.25s;
+}
+.step-line.done {
+    background: var(--green);
+}
+
+/* ── Dashboard ──────────────────────────────── */
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+    padding: 1rem 1.1rem;
+    background: linear-gradient(135deg, #1A3D2B 0%, #2A6048 100%);
+    border-radius: var(--radius);
+    color: white;
+}
+.dash-greeting {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.8) !important;
+    margin: 0 0 0.1rem;
+    letter-spacing: 0.5px;
+}
+.dash-name {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #ffffff !important;
+    margin: 0 0 0.1rem;
+}
+.dash-date {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.7) !important;
+    margin: 0;
+}
+.streak-pill {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 99px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: #ffffff !important;
+}
+/* Header text — higher specificity than the global * rule */
+div.dash-header,
+div.dash-header p,
+div.dash-header h2,
+div.dash-header div,
+div.dash-header span,
+p.dash-greeting,
+h2.dash-name,
+p.dash-date {
+    color: #ffffff !important;
+}
+
+/* Reminder banners */
+.banner {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 0.9rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.88rem;
+    margin-bottom: 0.5rem;
+    border-left: 4px solid transparent;
+}
+.banner-warn {
+    background: var(--amber-light);
+    border-left-color: var(--amber);
+    color: #7a5000;
+}
+.banner-info {
+    background: var(--blue-light);
+    border-left-color: var(--blue);
+    color: #1a3a5c;
+}
+.banner-ok {
+    background: var(--green-light);
+    border-left-color: var(--green);
+    color: var(--green-dark);
+}
+
+/* Task card wrapper — provides the coloured top border */
+div.tc-wrap {
+    background: #ffffff;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow);
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+}
+/* Button inside the card — styled as the card body */
+div.tc-wrap .stButton > button {
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    height: 90px !important;
+    padding: 0.6rem 0.4rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    white-space: pre-wrap !important;
+    line-height: 1.6 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+}
+div.tc-wrap .stButton > button:hover {
+    background: var(--green-light) !important;
+    color: var(--green-dark) !important;
+    border: none !important;
+}
+
+.progress-label {
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: -0.25rem;
+}
+
+/* Motivation box */
+.motivation-box {
+    background: linear-gradient(135deg, var(--green-light), var(--blue-light));
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+    margin-top: 0.5rem;
+    border: 1px solid var(--border);
+}
+.motivation-box p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-body);
+    line-height: 1.5;
+}
+
+/* ── Chat ────────────────────────────────────── */
+.chat-topbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.4rem 0;
+}
+.chat-avatar {
+    font-size: 1.8rem;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--green-light);
+    border-radius: 50%;
+}
+.chat-info strong { display: block; font-size: 0.95rem; color: var(--text-h); }
+.online-dot {
+    font-size: 0.75rem;
+    color: var(--green);
+    font-weight: 500;
+}
+
+/* Message bubbles */
+.msg-row {
+    display: flex;
+    margin-bottom: 0.7rem;
+    align-items: flex-end;
+    gap: 0.45rem;
+}
+.msg-user {
+    flex-direction: row-reverse;
+}
+.bubble {
+    max-width: 78%;
+    padding: 0.65rem 0.9rem;
+    border-radius: 18px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    position: relative;
+}
+.bubble-user {
+    background: var(--green);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+.bubble-ai {
+    background: var(--surface);
+    color: var(--text-body);
+    border-bottom-left-radius: 4px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+.bubble-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--green-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.msg-ts {
+    display: block;
+    font-size: 0.68rem;
+    opacity: 0.55;
+    margin-top: 0.2rem;
+    text-align: right;
+}
+
+/* Quick replies */
+.qr-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 0.3rem !important;
+}
+
+/* ── Diary ───────────────────────────────────── */
+.success-card {
+    background: var(--green-light);
+    border: 1.5px solid var(--green);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+.success-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.25rem;
+}
+.success-card h3 {
+    color: var(--green-dark);
+    margin: 0 0 0.3rem;
+    font-size: 1.15rem;
+}
+.success-card p {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 0.88rem;
+}
+
+/* AI feedback card */
+.ai-fb-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+    margin: 0.75rem 0;
+    box-shadow: var(--shadow);
+}
+.ai-fb-tag {
+    display: inline-block;
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.15rem 0.55rem;
+    border-radius: 99px;
+    margin-bottom: 0.5rem;
+}
+.ai-fb-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-body);
+}
+
+/* ── Meal logger ─────────────────────────────── */
+.meal-card {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.9rem;
+    margin-bottom: 0.4rem;
+    font-size: 0.88rem;
+}
+.meal-type  { font-weight: 600; flex-shrink: 0; }
+.meal-desc  { flex: 1; color: var(--text-body); }
+.meal-time  { color: var(--text-muted); font-size: 0.8rem; flex-shrink: 0; }
+
+/* ── Progress ────────────────────────────────── */
+.insight-card {
+    background: linear-gradient(135deg, var(--green-light), var(--blue-light));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+}
+.insight-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--text-body);
+}
+
+/* ── File uploader ───────────────────────────── */
+[data-testid="stFileUploader"],
+[data-testid="stFileUploadDropzone"],
+.stFileUploader,
+.stFileUploader > div,
+.stFileUploader section {
+    background: #ffffff !important;
+    border: 2px dashed #D1D5DB !important;
+    border-radius: var(--radius) !important;
+    color: #374151 !important;
+}
+[data-testid="stFileUploadDropzone"]:hover {
+    border-color: var(--green) !important;
+    background: var(--green-light) !important;
+}
+[data-testid="stFileUploadDropzone"] * {
+    color: #374151 !important;
+}
+[data-testid="stFileUploadDropzone"] button,
+[data-testid="stFileUploaderDropzoneInput"] + div button,
+.stFileUploader button,
+[data-testid="baseButton-secondary"] {
+    background: #ffffff !important;
+    color: #2E7D5E !important;
+    border: 1.5px solid #4CAF82 !important;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 600 !important;
+}
+[data-testid="stFileUploadDropzone"] button:hover,
+.stFileUploader button:hover {
+    background: var(--green-light) !important;
+    color: var(--green-dark) !important;
+}
+
+/* ── Slider ──────────────────────────────────── */
+.stSlider > div > div {
+    background: transparent !important;
+}
+.stSlider [data-baseweb="slider"] [role="slider"] {
+    background: var(--green) !important;
+    border-color: var(--green) !important;
+}
+
+/* ── Radio buttons ───────────────────────────── */
+/* Native input accent — turns the dot green when selected */
+.stRadio input[type="radio"],
+input[type="radio"] {
+    accent-color: #4CAF82 !important;
+    width: 16px !important;
+    height: 16px !important;
+    cursor: pointer !important;
+}
+/* BaseWeb circle — white unselected, green selected */
+.stRadio [data-baseweb="radio"] div:first-child {
+    background: #ffffff !important;
+    border-color: #9CA3AF !important;
+}
+.stRadio [aria-checked="true"] div:first-child {
+    background: #4CAF82 !important;
+    border-color: #4CAF82 !important;
+}
+
+/* ── Info / warning / error boxes ───────────── */
+[data-testid="stInfo"],
+.stAlert {
+    background: var(--blue-light) !important;
+    color: #1a3a5c !important;
+    border-left-color: var(--blue) !important;
+    border-radius: var(--radius-sm) !important;
+}
+[data-testid="stInfo"] * { color: #1a3a5c !important; }
+
+/* ── Expander ────────────────────────────────── */
+[data-testid="stExpander"],
+[data-testid="stExpander"] > div {
+    background: #ffffff !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-sm) !important;
+}
+
+/* ── Spinner ─────────────────────────────────── */
+.stSpinner > div {
+    border-top-color: var(--green) !important;
+}
+
+/* ── Responsive tweaks ───────────────────────── */
+@media (max-width: 600px) {
+    .main .block-container {
+        padding: 0.75rem 1rem 5rem !important;
+    }
+    .dash-name { font-size: 1.25rem; }
+    .bubble { max-width: 88%; }
+}
+
+/* ── Sidebar ─────────────────────────────────── */
+[data-testid="stSidebar"] {
+    background: var(--surface) !important;
+    border-right: 1px solid var(--border) !important;
+}
+[data-testid="stSidebar"] .block-container {
+    padding: 1.5rem 1rem !important;
+}
