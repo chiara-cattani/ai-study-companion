@@ -98,15 +98,15 @@ def _render_signup_form():
 
 def _complete_login(username: str):
     """Load persisted data for this user and go to dashboard."""
-    from utils.persistence import load as _load
+    from utils.persistence import load as _load, PERSIST_KEYS
 
     st.session_state.auth_username = username
     st.session_state.logged_in = True
 
-    # Drop the data-loaded guard so persistence can load this user's file
-    st.session_state.pop("_data_loaded", None)
-    # Drop tasks_today so it gets re-derived from loaded data
-    st.session_state.pop("tasks_today", None)
+    # Remove any session-defaulted values (set by init_session_state before auth)
+    # so that _load() can populate them from the user's data file.
+    for key in list(PERSIST_KEYS) + ["tasks_today", "_data_loaded"]:
+        st.session_state.pop(key, None)
 
     _load(st.session_state)
     st.rerun()

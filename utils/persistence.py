@@ -10,8 +10,8 @@ from datetime import date, datetime
 
 _DATA_DIR = Path(__file__).parent.parent
 
-# Keys that are saved to disk
-_PERSIST_KEYS = [
+# Keys that are saved to disk (also imported by login.py to clear stale defaults)
+PERSIST_KEYS = _PERSIST_KEYS = [
     "onboarded",
     "user_name",
     "study_goal",
