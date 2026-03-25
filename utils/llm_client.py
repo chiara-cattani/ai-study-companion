@@ -31,10 +31,15 @@ Rules you must always follow:
 - Use one relevant emoji per message.
 - Address the participant by name when natural.
 - Reference their study goal ("{goal}") when it adds value.
+- Stay focused on the study: diary, meals, symptoms, wellbeing, and nutrition. If the conversation drifts to unrelated topics, gently steer it back.{redirect_instruction}
 
 Participant name: {name}
 Study goal: {goal}
 """
+
+_REDIRECT_INSTRUCTION = """
+
+IMPORTANT for this response: The participant has sent {n} messages in a row that are unrelated to the study. Acknowledge what they said very briefly (one short clause), then warmly redirect them back to the study — ask about how they're feeling, whether they've logged their diary or meals today, or how their nutrition goal is going. Keep it friendly, not preachy."""
 
 # ── Demo response bank ─────────────────────────────────────────────────────
 
@@ -106,46 +111,77 @@ _DEMO = {
         "Happy to help with anything study-related! You can ask me about meals, symptoms, tips, or just chat. 😊",
         "That's a great point to raise. Is there anything in particular you'd like to log or track today? 📋",
     ],
+    "redirect": [
+        "Fun topic! I'm really here to support your study though, {name} — have you logged your meals or diary today? 📋",
+        "I appreciate the chat! To make the most of our time together, how about we check in on the study — how are you feeling symptom-wise? 🌿",
+        "Ha, I'd love to help with that, but my expertise is your nutrition study! How has your energy and digestion been today, {name}? 🥗",
+        "I'm best at the study stuff — let me nudge us back there! How's your goal to {goal} going this week? 🎯",
+        "Good topic for another time! For now — have you completed today's diary entry, {name}? It only takes two minutes. 📝",
+    ],
 }
 
 
-def _pick(category: str, name: str) -> str:
-    return random.choice(_DEMO[category]).format(name=name)
+# Keywords that indicate a study-related message (broad — includes greetings)
+_STUDY_KEYWORDS = (
+    "diary", "meal", "food", "log", "symptom", "progress", "study",
+    "nutrition", "health", "feel", "digest", "energy", "sleep", "goal",
+    "gut", "stomach", "bloat", "tip", "wellness", "advice", "remind",
+    "task", "score", "chart", "week", "streak", "stat", "data", "entry",
+    "logged", "drink", "water", "eat", "ate", "forgot", "miss", "sorry",
+    "hi", "hello", "hey", "how are you", "who are you", "what are you",
+    "good morning", "good afternoon", "good evening",
+)
+
+
+def is_study_related(text: str) -> bool:
+    """Return True if the message is related to the study or is a greeting."""
+    lower = text.lower()
+    return any(kw in lower for kw in _STUDY_KEYWORDS)
+
+
+def _pick(category: str, name: str, goal: str = "") -> str:
+    return random.choice(_DEMO[category]).format(name=name, goal=goal)
 
 
 def get_demo_response(user_input: str, context: dict) -> str:
     """Route user input to the most relevant demo response category."""
     text = user_input.lower()
     name = context.get("name", "there")
+    goal = context.get("goal", "")
+    streak = context.get("off_topic_streak", 0)
+
+    # If the user has been off-topic for 2+ messages in a row, redirect
+    if streak >= 2 and not is_study_related(user_input):
+        return _pick("redirect", name, goal)
 
     # Identity questions
     if any(w in text for w in ["your name", "who are you", "what are you", "tell me about yourself"]):
-        return _pick("identity", name)
+        return _pick("identity", name, goal)
     # How are you
     if any(w in text for w in ["how are you", "how r u", "you doing", "you okay", "you good"]):
-        return _pick("how_are_you", name)
+        return _pick("how_are_you", name, goal)
     # Greetings
     if any(w in text for w in ["hello", "hi!", "hey!", "good morning", "good afternoon", "good evening"]) or text.strip() in ["hi", "hey", "hello"]:
-        return _pick("greeting", name)
+        return _pick("greeting", name, goal)
     # Digestion / symptoms
     if any(w in text for w in ["digestion", "stomach", "bloat", "gut", "bowel", "cramp", "constip", "nausea", "symptom"]):
-        return _pick("digestion", name)
+        return _pick("digestion", name, goal)
     # Missed tasks
     if any(w in text for w in ["forgot", "missed", "didn't", "couldn't", "skip", "sorry", "apologise", "apologi"]):
-        return _pick("empathy", name)
+        return _pick("empathy", name, goal)
     # Wellness coaching
     if any(w in text for w in ["tip", "wellness", "advice", "suggest", "coach", "what should", "help me", "recommend"]):
-        return _pick("coaching", name)
+        return _pick("coaching", name, goal)
     # Diary / logging
     if any(w in text for w in ["diary", "entry", "logged", "completed", "done", "submitted", "filled"]):
-        return _pick("diary_feedback", name)
+        return _pick("diary_feedback", name, goal)
     # Progress / stats
     if any(w in text for w in ["progress", "streak", "week", "chart", "how am i", "stats", "data", "score"]):
-        return _pick("progress", name)
+        return _pick("progress", name, goal)
     # Reminders / tasks
     if any(w in text for w in ["remind", "task", "meal", "log", "forget", "today"]):
-        return _pick("task_reminder", name)
-    return _pick("general", name)
+        return _pick("task_reminder", name, goal)
+    return _pick("general", name, goal)
 
 
 # ── Public API ─────────────────────────────────────────────────────────────
@@ -230,9 +266,16 @@ def _build_messages(user_input: str, context: dict):
 
 
 def _system(context: dict) -> str:
+    streak = context.get("off_topic_streak", 0)
+    redirect = (
+        _REDIRECT_INSTRUCTION.format(n=streak)
+        if streak >= 2 and not is_study_related(context.get("last_user_message", ""))
+        else ""
+    )
     return SYSTEM_PROMPT.format(
         name=context.get("name", "Participant"),
         goal=context.get("goal", "improve health"),
+        redirect_instruction=redirect,
     )
 
 

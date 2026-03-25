@@ -5,7 +5,7 @@ AI Chat Coach interface.
 import re
 import streamlit as st
 from utils.state_manager import add_chat_message
-from utils.llm_client import generate_response
+from utils.llm_client import generate_response, is_study_related
 
 
 def _md(text: str) -> str:
@@ -138,14 +138,26 @@ def _send(text: str):
     # Mark check-in done only when the user actually sends a message
     st.session_state.tasks_today["check_in"] = True
 
+    # Track consecutive off-topic messages (reset on study-related input)
+    if is_study_related(text):
+        st.session_state.off_topic_streak = 0
+    else:
+        st.session_state.off_topic_streak = st.session_state.get("off_topic_streak", 0) + 1
+
     context = {
         "name": st.session_state.user_name,
         "goal": st.session_state.study_goal,
         "history": list(st.session_state.chat_messages[:-1]),
+        "off_topic_streak": st.session_state.off_topic_streak,
+        "last_user_message": text,
     }
     provider = st.session_state.get("llm_provider", "demo")
 
     response = generate_response(text, context, provider)
+
+    # If we redirected, reset the streak so we don't keep redirecting every message
+    if st.session_state.off_topic_streak >= 2:
+        st.session_state.off_topic_streak = 0
 
     add_chat_message("assistant", response)
     st.rerun()
